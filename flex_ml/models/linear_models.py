@@ -1,9 +1,13 @@
-from .base_model import BaseModel
+# Load packages
 import numpy as np
 import pickle
-import matplotlib.pyplot as plt
 from typing import Union
 
+# Third party imports
+import matplotlib.pyplot as plt
+
+# Local imports
+from .base_model import BaseModel
 
 class LinearRegression(BaseModel):
     def __init__(self, method: str = "ols", 
