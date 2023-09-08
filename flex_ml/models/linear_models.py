@@ -10,13 +10,17 @@ import matplotlib.pyplot as plt
 from .base_model import BaseModel
 
 class LinearRegression(BaseModel):
+    DEFAULT_ALPHA = 0.1
+    DEFAULT_LEARNING_RATE = 0.01
+    DEFAULT_EPOCHS = 1000
+    
     def __init__(self, method: str = "ols", 
                  fit_intercept: bool = True,
                  normalize: bool = False, 
-                 learning_rate: float = 0.01, 
-                 epochs: int = 1000, 
+                 learning_rate: float = None, 
+                 epochs: int = None, 
                  regularization: Union[None, str] = None, 
-                 alpha: float = 0.1) -> None:
+                 alpha: float = None) -> None:
         """
         Initialize a Linear Regression model.
         
@@ -43,10 +47,10 @@ class LinearRegression(BaseModel):
         self.method = method
         self.fit_intercept = fit_intercept
         self.normalize = normalize
-        self.learning_rate = learning_rate
-        self.epochs = epochs
+        self.learning_rate = learning_rate if learning_rate else self.DEFAULT_LEARNING_RATE
+        self.epochs = epochs if epochs else self.DEFAULT_EPOCHS
         self.regularization = regularization
-        self.alpha = alpha
+        self.alpha = alpha if alpha else self.DEFAULT_ALPHA
         self.coef_ = None
         self.intercept_ = None
     
