@@ -10,7 +10,13 @@ import matplotlib.pyplot as plt
 from .base_model import BaseModel
 
 class LinearRegression(BaseModel):
-    DEFAULT_ALPHA = 0.1
+    """
+    Implements a linear regression model with options for both Ordinary Least Squares (OLS) 
+    and gradient descent optimization methods.
+    
+    The class also offers options for L1 (Lasso) and L2 (Ridge) regularization.
+    """
+    DEFAULT_ALPHA = 0.1 # Chosen for reasonable balance between penalty and flexibility
     DEFAULT_LEARNING_RATE = 0.01
     DEFAULT_EPOCHS = 1000
     
@@ -56,7 +62,13 @@ class LinearRegression(BaseModel):
 
     def _apply_regularization(self, coef):
         """
-        Computes regularization based on the regularization method
+        Applies regularization to the coefficients. 
+        
+        Regularization helps to prevent overfitting by adding a penalty term.
+        L1 regularization (Lasso) results in sparse solutions whereas L2 (Ridge) does not.
+        
+        If no regularization is specified, the function will return zero, effectively
+        not altering the cost function.
         
         Parameters
         ----------
@@ -88,8 +100,18 @@ class LinearRegression(BaseModel):
 
     def _fit_ols(self, X, y):
         """
-        Fit the model using ordinary least squares
+        Fit the model using Ordinary Least Squares (OLS) method.
         
+        Time Complexity: This method has a time complexity of O(N^2) due to the matrix inversion step.
+        Assumptions: Assumes that X'X is invertible.
+        
+        Steps:
+            1. Compute X'X (the dot product of the transposed feature matrix and itself)
+            2. Apply regularization (if any)
+            3. Compute the inverse of X'X
+            4. Compute X'y (the dot product of the transposed feature matrix and target vector)
+            5. Compute the coefficients by multiplying the inverse of X'X and X'y
+            
         Parameters
         ----------
         X : np.ndarray
@@ -108,6 +130,11 @@ class LinearRegression(BaseModel):
         """
         Fit the model using gradient descent
         
+        Time Complexity: This method has a time complexity of O(N * epochs).
+        
+        Note: Gradient descent is chosen over OLS when the data is too large to fit in memory or 
+        when a non-linear decision boundary is required.
+        
         Parameters
         ----------
         X : np.ndarray
@@ -116,12 +143,18 @@ class LinearRegression(BaseModel):
             Target vector
         """
         coef = np.zeros(X.shape[1])
+        # Main loop for updating coefficients based on gradient
         for _ in range(self.epochs):
+            # Compute predictions and errors
             predictions = np.dot(X, coef)
             errors = y - predictions
+            # Compute gradient (Note: the 2* is to simplify the derivative of the cost function)
             gradient = 2 * np.dot(X.T, errors) / X.shape[0]
+            # Apply regularization (if any)
             gradient += self._apply_regularization(coef)
+            # Update coefficients using the calculated gradient
             coef -= self.learning_rate * gradient
+        # Set coefficients
         self._set_coefficients(coef)
                 
     def fit(self, X, y):
@@ -136,6 +169,7 @@ class LinearRegression(BaseModel):
             Target vector
         """
         if self.normalize:
+            # Normalize features to zero mean and unit variance for better numerical stability
             X = (X - X.mean(axis=0)) / X.std(axis=0)
         
         if self.fit_intercept:
@@ -152,16 +186,22 @@ class LinearRegression(BaseModel):
         """
         Predict target values for the given feature matrix
         
+        This method will utilize the coefficients (self.coef_) and intercept (self.intercept_)
+        to make predictions.
+        
         Parameters
         ----------
         X : np.ndarray
             Feature matrix
         """
+        # TODO: Implement this method
         pass
     
     def score(self, X, y):
         """
         Score the model on the given feature matrix and target vector
+        
+        Will calculate the R^2 score based on the predictions and actual values.
         
         Parameters
         ----------
@@ -170,7 +210,7 @@ class LinearRegression(BaseModel):
         y : np.ndarray
             Target vector
         """
-        # Implement R^2 score calculation
+        # TODO: Implement R^2 score calculation
         pass
     
     def get_params(self):
@@ -187,6 +227,7 @@ class LinearRegression(BaseModel):
     
     def summary(self):
         """Print summary of model"""
+        # TODO: Implement this method
         pass
     
     def cross_validate(self, X, y, cv=5):
@@ -201,11 +242,12 @@ class LinearRegression(BaseModel):
         cv : int, optional
             Number of folds for cross validation. The default is 5.
         """
-        # implement cross validation
+        # TODO: implement cross validation
         pass
     
     def feature_importance(self):
         """Return feature importance for each feature"""
+        # TODO: Implement this method
         pass
     
     def predict_proba(self, X):
@@ -216,11 +258,14 @@ class LinearRegression(BaseModel):
         X : np.ndarray
             Feature matrix
         """
-        # Implement predict_proba method
+        # TODO: Implement predict_proba method
         pass
     
     def save(self, filename):
-        """Save model to a file
+        """
+        Saves the model as a Pickle file. Ensure that the destination directory exists.
+    
+        Note: Be cautious while loading pickled files from an untrusted source as it might be insecure.
         
         Parameters
         ----------
@@ -232,7 +277,10 @@ class LinearRegression(BaseModel):
     
     @classmethod
     def load(cls, filename):
-        """Load model from a file
+        """
+        Loads the model from a Pickle file.
+    
+        Warning: Only load Pickle files from trusted sources to avoid security risks.
         
         Parameters
         ----------
