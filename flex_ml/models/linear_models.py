@@ -53,7 +53,77 @@ class LinearRegression(BaseModel):
         self.alpha = alpha if alpha else self.DEFAULT_ALPHA
         self.coef_ = None
         self.intercept_ = None
+
+    def _apply_regularization(self, coef):
+        """
+        Computes regularization based on the regularization method
+        
+        Parameters
+        ----------
+        coef : np.ndarray
+            Coefficients of the model
+        """
+        if self.regularization == "l1":
+            return self.alpha * np.sign(coef)
+        elif self.regularization == "l2":
+            return self.alpha * coef
+        else:
+            return 0
     
+    def _set_coefficients(self, coef):
+        """
+        Set the coefficients of the model
+        
+        Parameters
+        ----------
+        coef : np.ndarray
+            Coefficients of the model
+        """
+        if self.fit_intercept:
+            self.intercept_ = coef[0]
+            self.coef_ = coef[1:]
+        else:
+            self.intercept_ = 0
+            self.coef_ = coef
+
+    def _fit_ols(self, X, y):
+        """
+        Fit the model using ordinary least squares
+        
+        Parameters
+        ----------
+        X : np.ndarray
+            Feature matrix
+        y : np.ndarray
+            Target vector
+        """
+        XtX = np.dot(X.T, X)
+        XtX += self._apply_regularization(XtX)
+        XtX_inv = np.linalg.inv(XtX)
+        Xt_y = np.dot(X.T, y)
+        coef = np.dot(XtX_inv, Xt_y)
+        self._set_coefficients(coef)
+    
+    def _fit_gradient_descent(self, X, y):
+        """
+        Fit the model using gradient descent
+        
+        Parameters
+        ----------
+        X : np.ndarray
+            Feature matrix
+        y : np.ndarray
+            Target vector
+        """
+        coef = np.zeros(X.shape[1])
+        for _ in range(self.epochs):
+            predictions = np.dot(X, coef)
+            errors = y - predictions
+            gradient = 2 * np.dot(X.T, errors) / X.shape[0]
+            gradient += self._apply_regularization(coef)
+            coef -= self.learning_rate * gradient
+        self._set_coefficients(coef)
+                
     def fit(self, X, y):
         """
         Fit the model to the training data
@@ -77,67 +147,6 @@ class LinearRegression(BaseModel):
             self._fit_gradient_descent(X, y)
         else:
             raise ValueError("Invalid method specified. Choose either 'ols' or 'gradient_descent'")
-    
-    def _fit_ols(self, X, y):
-        """
-        Fit the model using ordinary least squares
-        
-        Parameters
-        ----------
-        X : np.ndarray
-            Feature matrix
-        y : np.ndarray
-            Target vector
-        """
-        XtX = np.dot(X.T, X)
-        if self.regularization == "l1":
-            XtX += self.alpha * np.eye(XtX.shape[1])
-        elif self.regularization == "l2":
-            XtX += self.alpha * np.eye(XtX.shape[1])
-        
-        XtX_inv = np.linalg.inv(XtX)
-        Xt_y = np.dot(X.T, y)
-        coef = np.dot(XtX_inv, Xt_y)
-        
-        if self.fit_intercept:
-            self.intercept_ = coef[0]
-            self.coef_ = coef[1:]
-        else:
-            self.intercept_ = 0
-            self.coef_ = coef
-    
-    def _fit_gradient_descent(self, X, y):
-        """
-        Fit the model using gradient descent
-        
-        Parameters
-        ----------
-        X : np.ndarray
-            Feature matrix
-        y : np.ndarray
-            Target vector
-        """
-        coef = np.zeros(X.shape[1])
-        
-        for _ in range(self.epochs):
-            predictions = np.dot(X, coef)
-            errors = y - predictions
-            gradient = 2 * np.dot(X.T, errors) / X.shape[0]
-        
-            if self.regularization == "l1":
-                gradient += self.alpha * np.sign(coef)
-            elif self.regularization == "l2":
-                gradient += self.alpha * coef
-            
-            coef -= self.learning_rate * gradient
-        
-        if self.fit_intercept:
-            self.intercept_ = coef[0]
-            self.coef_ = coef[1:]
-        else:
-            self.intercept_ = 0
-            self.coef_ = coef
-                
     
     def predict(self, X):
         """
