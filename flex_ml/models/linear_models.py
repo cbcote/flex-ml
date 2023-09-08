@@ -2,11 +2,40 @@ from .base_model import BaseModel
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
+from typing import Union
 
 
 class LinearRegression(BaseModel):
-    def __init__(self, method="ols", fit_intercept=True, normalize=False, 
-                 learning_rate=0.01, epochs=1000, regularization=None, alpha=0.1) -> None:
+    def __init__(self, method: str = "ols", 
+                 fit_intercept: bool = True,
+                 normalize: bool = False, 
+                 learning_rate: float = 0.01, 
+                 epochs: int = 1000, 
+                 regularization: Union[None, str] = None, 
+                 alpha: float = 0.1) -> None:
+        """
+        Initialize a Linear Regression model.
+        
+        Parameters
+        ----------
+        method : str, optional
+            Method to use for fitting the model. The default is "ols".
+        fit_intercept : bool, optional
+            Whether to fit an intercept term. The default is True.
+        normalize : bool, optional
+            Whether to normalize the feature matrix. The default is False.
+        learning_rate : float, optional
+            Learning rate for gradient descent. The default is 0.01.
+        epochs : int, optional
+            Number of epochs for gradient descent. The default is 1000.
+        regularization : Union[None, str], optional
+            Regularization method to use. The default is None.
+        alpha : float, optional
+            Regularization parameter. The default is 0.1.
+        """
+        if method not in ["ols", "gradient_descent"]:
+            raise ValueError("Invalid method specified. Choose either 'ols' or 'gradient_descent'")
+        
         self.method = method
         self.fit_intercept = fit_intercept
         self.normalize = normalize
