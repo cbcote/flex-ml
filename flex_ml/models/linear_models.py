@@ -5,11 +5,15 @@ import matplotlib.pyplot as plt
 
 
 class LinearRegression(BaseModel):
-    def __init__(self, fit_intercept=True, normalize=False, penalty='l2', alpha=0.1) -> None:
+    def __init__(self, method='ols', fit_intercept=True, normalize=False, 
+                 learning_rate=0.01, epochs=1000, regularization=None, alpha=0.1) -> None:
         super().__init__()
+        self.method = method
         self.fit_intercept = fit_intercept
         self.normalize = normalize
-        self.penalty = penalty
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+        self.regularization = regularization
         self.alpha = alpha
         self.coef_ = None
         self.intercept_ = None
@@ -21,8 +25,21 @@ class LinearRegression(BaseModel):
         if self.fit_intercept:
             X = np.hstack((np.ones((X.shape[0], 1)), X))
         
-        # Compute coefficients using OLS method
-        XtX_inv = np.linalg.inv(np.dot(X.T, X))
+        if self.method == 'ols':
+            self._fit_ols(X, y)
+        elif self.method == 'gradient_descent':
+            self._fit_gradient_descent(X, y)
+        else:
+            raise ValueError("Invalid method specified. Choose either 'ols' or 'gradient_descent'")
+    
+    def _fit_ols(self, X, y):
+        XtX = np.dot(X.T, X)
+        if self.regularization == 'l1':
+            XtX += self.alpha * np.eye(XtX.shape[1])
+        elif self.regularization == 'l2':
+            XtX += self.alpha * np.eye(XtX.shape[1])
+        
+        XtX_inv = np.linalg.inv(XtX)
         Xt_y = np.dot(X.T, y)
         coef = np.dot(XtX_inv, Xt_y)
         
@@ -30,8 +47,31 @@ class LinearRegression(BaseModel):
             self.intercept_ = coef[0]
             self.coef_ = coef[1:]
         else:
-            self.intercept_
+            self.intercept_ = 0
             self.coef_ = coef
+    
+    def _fit_gradient_descent(self, X, y):
+        coef = np.zeros(X.shape[1])
+        
+        for _ in range(self.epochs):
+            predictions = np.dot(X, coef)
+            errors = y - predictions
+            gradient = 2 * np.dot(X.T, errors) / X.shape[0]
+        
+        if self.regularization == 'l1':
+            gradient += self.alpha * np.sign(coef)
+        elif self.regularization == 'l2':
+            gradient += self.alpha * coef
+        
+        coef -= self.learning_rate * gradient
+        
+        if self.fit_intercept:
+            self.intercept_ = coef[0]
+            self.coef_ = coef[1:]
+        else:
+            self.intercept_ = 0
+            self.coef_ = coef
+                
     
     def predict(self, X):
         pass
