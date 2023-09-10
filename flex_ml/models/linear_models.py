@@ -307,3 +307,9 @@ class LinearRegression(BaseModel):
         plt.xlabel("Predicted")
         plt.ylabel("Residuals")
         plt.show()
+
+    def __str__(self):
+            return f"Linear Regression Model (method: {self.method}, fit_intercept: {self.fit_intercept}, learning_rate: {self.learning_rate}, epochs: {self.epochs}, regularization: {self.regularization}, alpha: {self.alpha})"
+
+    def __repr__(self):
+            return f"LinearRegression(method='{self.method}', fit_intercept={self.fit_intercept}, learning_rate={self.learning_rate}, epochs={self.epochs}, regularization={self.regularization}, alpha={self.alpha})"
