@@ -19,6 +19,7 @@ class LinearRegression(BaseModel):
     DEFAULT_ALPHA = 0.1 # Chosen for reasonable balance between penalty and flexibility
     DEFAULT_LEARNING_RATE = 0.01
     DEFAULT_EPOCHS = 1000
+    GRADIENT_CALCULATION_FACTOR = 2  # Used to simplify the derivative in gradient calculation
     
     def __init__(self, method: str = "ols", 
                  fit_intercept: bool = True,
@@ -149,7 +150,7 @@ class LinearRegression(BaseModel):
             predictions = np.dot(X, coef)
             errors = y - predictions
             # Compute gradient (Note: the 2* is to simplify the derivative of the cost function)
-            gradient = 2 * np.dot(X.T, errors) / X.shape[0]
+            gradient = self.GRADIENT_CALCULATION_FACTOR * np.dot(X.T, errors) / X.shape[0]
             # Apply regularization (if any)
             gradient += self._apply_regularization(coef)
             # Update coefficients using the calculated gradient
