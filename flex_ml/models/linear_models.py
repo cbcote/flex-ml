@@ -60,7 +60,7 @@ class LinearRegression(BaseModel):
         """
         # Type and Value check for 'method' parameter
         if method not in FitMethod.__members__:
-            raise ValueError("Invalid method specified. Choose either {list(FitMethod.__members__.keys())}")
+            raise ValueError(f"Invalid method specified. Choose either {list(FitMethod.__members__.keys())}")
         
         # Value Range check for 'learning_rate' parameter
         if learning_rate and learning_rate <= 0:
