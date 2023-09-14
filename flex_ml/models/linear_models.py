@@ -1,7 +1,10 @@
 # Load packages
 import numpy as np
 import pickle
+
+# Type hints
 from typing import Union
+from numpy.typing import ArrayLike
 
 # Third party imports
 import matplotlib.pyplot as plt
@@ -127,7 +130,7 @@ class LinearRegression(BaseModel):
         coef = np.dot(XtX_inv, Xt_y)
         self._set_coefficients(coef)
     
-    def _fit_gradient_descent(self, X, y):
+    def _fit_gradient_descent(self, X: ArrayLike, y: ArrayLike):
         """
         Fit the model using gradient descent
         
@@ -158,7 +161,7 @@ class LinearRegression(BaseModel):
         # Set coefficients
         self._set_coefficients(coef)
                 
-    def fit(self, X, y):
+    def fit(self, X: ArrayLike, y: ArrayLike):
         """
         Fit the model to the training data
         
