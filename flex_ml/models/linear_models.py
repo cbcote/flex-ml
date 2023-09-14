@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 
 # Type hints
-from typing import Union
+from typing import Union, Optional, List
 from numpy.typing import ArrayLike
 from enum import Enum
 
@@ -30,13 +30,14 @@ class LinearRegression(BaseModel):
     DEFAULT_EPOCHS = 1000
     GRADIENT_CALCULATION_FACTOR = 2  # Used to simplify the derivative in gradient calculation
     
-    def __init__(self, method: str = "ols", 
+    def __init__(self, 
+                 method: FitMethod = FitMethod.OLS, 
                  fit_intercept: bool = True,
                  normalize: bool = False, 
-                 learning_rate: float = None, 
-                 epochs: int = None, 
-                 regularization: Union[None, str] = None, 
-                 alpha: float = None) -> None:
+                 learning_rate: Optional[float] = None, 
+                 epochs: int = Optional[None], 
+                 regularization: Optional[str] = None, 
+                 alpha: Optional[float] = None) -> None:
         """
         Initialize a Linear Regression model.
         
@@ -73,6 +74,11 @@ class LinearRegression(BaseModel):
         if alpha is not None and alpha <= 0:
             raise ValueError("alpha must be non-negative")
         
+        # Check for valid regularization method
+        valid_regularization_methods = [None, "l1", "l2"]
+        if regularization not in valid_regularization_methods:
+            raise ValueError(f"Invalid regularization method specified. Choose fron {valid_regularization_methods}")
+                
         self.method = method
         self.fit_intercept = fit_intercept
         self.normalize = normalize
