@@ -193,13 +193,16 @@ class LinearRegression(BaseModel):
         Parameters
         ----------
         X : np.ndarray
-            Feature matrix
+            2D feature matrix
         y : np.ndarray
-            Target vector
+            1D target vector
         """
         # Type and Shape checking for 'X' and 'y' parameters
         if not isinstance(X, np.ndarray) or not isinstance(y, np.ndarray):
             raise TypeError("X and y must be type np.ndarray")
+        
+        if len(X.shape) != 2 or len(y.shape) != 1:
+            raise ValueError("X must be 2D and y must be 1D")
         
         if X.shape[0] != y.shape[0]:
             raise ValueError("X and y must have the same dimensions")
