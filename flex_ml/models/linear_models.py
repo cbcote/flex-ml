@@ -5,12 +5,18 @@ import pickle
 # Type hints
 from typing import Union
 from numpy.typing import ArrayLike
+from enum import Enum
 
 # Third party imports
 import matplotlib.pyplot as plt
 
 # Local imports
 from .base_model import BaseModel
+
+class FitMethod(Enum):
+    OLS = "ols"
+    GRADIENT_DESCENT = "gradient_descent"
+
 
 class LinearRegression(BaseModel):
     """
@@ -51,8 +57,21 @@ class LinearRegression(BaseModel):
         alpha : float, optional
             Regularization parameter. The default is 0.1.
         """
-        if method not in ["ols", "gradient_descent"]:
-            raise ValueError("Invalid method specified. Choose either 'ols' or 'gradient_descent'")
+        # Type and Value check for 'method' parameter
+        if method not in FitMethod.__members__:
+            raise ValueError("Invalid method specified. Choose either {list(FitMethod.__members__.keys())}")
+        
+        # Value Range check for 'learning_rate' parameter
+        if learning_rate and learning_rate <= 0:
+            raise ValueError("learning_rate must be greater than 0")
+        
+        # Value Range check for 'epochs' parameter
+        if epochs is not None and epochs <= 0:
+            raise ValueError("epochs must be greater than 0")
+        
+        # Value Range check for 'alpha' parameter
+        if alpha is not None and alpha <= 0:
+            raise ValueError("alpha must be non-negative")
         
         self.method = method
         self.fit_intercept = fit_intercept
