@@ -2,6 +2,9 @@
 import numpy as np
 import pickle
 
+# Logging
+import logging
+
 # Type hints
 from typing import Union, Optional, List
 from numpy.typing import ArrayLike
@@ -220,6 +223,8 @@ class LinearRegression(BaseModel):
             self._fit_gradient_descent(X, y)
         else:
             raise ValueError("Invalid method specified. Choose either 'ols' or 'gradient_descent'")
+        
+        logging.info("Finished fitting the model.")
     
     def predict(self, X):
         """
