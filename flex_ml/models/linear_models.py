@@ -34,7 +34,7 @@ class LinearRegression(BaseModel):
     GRADIENT_CALCULATION_FACTOR = 2  # Used to simplify the derivative in gradient calculation
     
     def __init__(self, 
-                 method: FitMethod = FitMethod.OLS, 
+                 method: str = "ols", 
                  fit_intercept: bool = True,
                  normalize: bool = False, 
                  learning_rate: Optional[float] = None, 
@@ -61,9 +61,12 @@ class LinearRegression(BaseModel):
         alpha : float, optional
             Regularization parameter. The default is 0.1.
         """
-        # Type and Value check for 'method' parameter
-        if method not in FitMethod.__members__:
-            raise ValueError(f"Invalid method specified. Choose either {list(FitMethod.__members__.keys())}")
+        # # Type and Value check for 'method' parameter
+        # if method not in FitMethod.__members__:
+        #     raise ValueError(f"Invalid method specified. Choose either {list(FitMethod.__members__.keys())}")
+        
+        if method.lower() not in [e.value for e in FitMethod]:
+            raise ValueError(f"Invalid method specified. Choose either {[e.value for e in FitMethod]}")
         
         # Value Range check for 'learning_rate' parameter
         if learning_rate and learning_rate <= 0:
