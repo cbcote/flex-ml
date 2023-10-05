@@ -274,8 +274,7 @@ class LinearRegression(BaseModel):
     
     def summary(self):
         """Print summary of model"""
-        # TODO: Implement this method
-        pass
+        return self.__str__()
     
     def cross_validate(self, X, y, cv=5):
         """Perform cross validation on the given feature matrix and target vector
